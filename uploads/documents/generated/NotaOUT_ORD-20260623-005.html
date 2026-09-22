@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nota Selesai — ORD-20260623-005</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #F3F4F6; color: #1F2937; line-height: 1.5; padding: 20px; }
+    .nota-container { max-width: 600px; margin: 0 auto; background: #FFF; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; border-top: 6px solid #10B981; }
+    
+    .header { padding: 30px; border-bottom: 2px dashed #E5E7EB; text-align: center; }
+    .logo { font-size: 28px; font-weight: 800; color: #111827; letter-spacing: -1px; margin-bottom: 5px; }
+    .logo span { color: #10B981; font-style: italic; }
+    .company-info { font-size: 13px; color: #6B7280; }
+    
+    .title-box { background: #F9FAFB; padding: 15px 30px; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; }
+    .nota-title { font-size: 18px; font-weight: 800; color: #10B981; text-transform: uppercase; letter-spacing: 1px; }
+    .badge-out { background: #D1FAE5; color: #065F46; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    
+    .content { padding: 30px; }
+    
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+    .info-box h4 { font-size: 11px; text-transform: uppercase; color: #9CA3AF; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-box p { font-size: 14px; font-weight: 600; color: #111827; }
+    .info-box p.light { font-weight: 400; font-size: 13px; color: #4B5563; }
+    
+    .table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 13px; }
+    .table th { background: #F3F4F6; padding: 10px; text-align: left; font-weight: 600; color: #4B5563; border-bottom: 2px solid #E5E7EB; }
+    .table td { padding: 12px 10px; border-bottom: 1px solid #E5E7EB; vertical-align: middle; }
+    .table td strong { color: #111827; }
+    .table tfoot td { font-weight: 700; font-size: 15px; color: #10B981; background: #F9FAFB; border-bottom: none; }
+    
+    .comparison-card { border: 1px solid #E5E7EB; border-radius: 10px; padding: 15px; background: #F9FAFB; margin-bottom: 15px; }
+    .comparison-header { font-size: 12px; font-weight: 800; color: #10B981; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #E5E7EB; text-transform: uppercase; letter-spacing: 0.5px; }
+    .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .photo-box { border: 2px dashed #D1D5DB; border-radius: 8px; padding: 10px; text-align: center; background: #FFF; }
+    .photo-box h4 { font-size: 11px; color: #4B5563; margin-bottom: 8px; font-weight: 700; }
+    .photo-box img { width: 100%; aspect-ratio: 4/3; border-radius: 6px; border: 1px solid #E5E7EB; object-fit: cover; }
+    .no-photo { aspect-ratio: 4/3; background: #F3F4F6; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 11px; color: #9CA3AF; border: 1px solid #E5E7EB; }
+    
+    .footer { padding: 20px 30px; background: #F9FAFB; border-top: 1px solid #E5E7EB; text-align: center; font-size: 12px; color: #6B7280; display: flex; justify-content: space-between; }
+    
+    @media (max-width: 480px) {
+        .info-grid { grid-template-columns: 1fr; gap: 15px; }
+        .photo-grid { grid-template-columns: 1fr; }
+        .footer { flex-direction: column; gap: 10px; text-align: center; }
+        .nota-container { border-radius: 0; }
+        body { padding: 0; }
+    }
+    @media print {
+        body { background: white; padding: 0; }
+        .nota-container { box-shadow: none; border-top: none; max-width: 100%; }
+        .photo-grid { page-break-inside: avoid; }
+    }
+</style>
+</head>
+<body>
+
+<div class="nota-container">
+    <div class="header">
+        <div class="logo">Foot<span>Step</span>szs</div>
+        <div class="company-info">
+            Jl. Cluster Tigris Raya No. 29, Malang<br>
+            WA: 089681276080 | IG: @footstepszs
+        </div>
+    </div>
+    
+    <div class="title-box">
+        <div class="nota-title">BUKTI PENGAMBILAN</div>
+        <div class="badge-out">LUNAS / SELESAI</div>
+    </div>
+    
+    <div class="content">
+        <div class="info-grid">
+            <div class="info-box">
+                <h4>Kode Order</h4>
+                <p>ORD-20260623-005</p>
+            </div>
+            <div class="info-box" style="text-align: right;">
+                <h4>Tanggal Selesai</h4>
+                <p>23 June 2026, 07:13</p>
+            </div>
+            <div class="info-box">
+                <h4>Informasi Pelanggan</h4>
+                <p>Carlo Suryahasilaga</p>
+                <p class="light">089681276080</p>
+            </div>
+            <div class="info-box" style="text-align: right;">
+                <h4>Layanan</h4>
+                <p>Regular</p>
+            </div>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Item & Treatment</th>
+                    <th style="text-align:center">Qty</th>
+                    <th style="text-align:right">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                                <tr>
+                    <td>
+                        <strong>Sepatu</strong><br>
+                        <span style="color:#6B7280;font-size:11px">Deep Cleaning</span>
+                    </td>
+                    <td style="text-align:center">1</td>
+                    <td style="text-align:right">Rp 25.000</td>
+                </tr>
+                            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" style="text-align:right">LUNAS DIBAYARKAN</td>
+                    <td style="text-align:right">Rp 25.000</td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        <h4 style="font-size:13px; color:#4B5563; margin-bottom:12px; text-align:center;">📸 Perbandingan Kondisi Barang</h4>
+        
+        
+                                    <div class="comparison-card">
+                    <div class="comparison-header">Item #1</div>
+                    <div class="photo-grid">
+                        <div class="photo-box">
+                            <h4>Kondisi Awal (Masuk)</h4>
+                                                            <img src="http://localhost/footstepszs/uploads/documents/TT1_ORD-20260623-005_1782191514_0.jpeg" alt="Foto Awal #1">
+                                                    </div>
+                        <div class="photo-box">
+                            <h4>Kondisi Akhir (Selesai)</h4>
+                                                            <img src="http://localhost/footstepszs/uploads/documents/1782191614_tt2_ord26_0.jpeg" alt="Foto Akhir #1">
+                                                    </div>
+                    </div>
+                </div>
+                            
+        <div style="font-size:12px; color:#065F46; background:#D1FAE5; padding:12px; border-radius:6px; border-left:4px solid #10B981; text-align:center;">
+            <strong>Terima Kasih!</strong> Barang Anda telah selesai dibersihkan dan siap digunakan kembali.
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div>Diselesaikan oleh: <strong>Administrator Footstepszs</strong></div>
+        <div>Waktu Cetak: 23 Jun 2026, 07:13</div>
+    </div>
+</div>
+
+</body>
+</html>
