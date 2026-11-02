@@ -1,7 +1,7 @@
 <?php
 /**
  * templates/doc_order.php
- * Laporan Order — identitas perusahaan, footer pencetak, nomor halaman, timestamp
+ * Laporan Order - identitas perusahaan, footer pencetak, nomor halaman, timestamp
  */
 $admin_name = $adminName ?? $_SESSION['nama'] ?? 'Administrator';
 $print_time = date('d F Y, H:i:s');
@@ -10,7 +10,7 @@ $total_all  = array_sum(array_column($rows, 'total_harga'));
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Laporan Order — <?= isset($tgl_start) && $tgl_start ? date('d M Y', strtotime($tgl_start)).' – '.date('d M Y', strtotime($tgl_end)) : date('F Y', strtotime($bulan.'-01')) ?></title>
+<title>Laporan Order - <?= isset($tgl_start) && $tgl_start ? date('d M Y', strtotime($tgl_start)).' – '.date('d M Y', strtotime($tgl_end)) : date('F Y', strtotime($bulan.'-01')) ?></title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; padding: 2.5rem; color: #1a1a1a; font-size: 13px; }
@@ -73,7 +73,7 @@ tfoot td { background: #EDE9FE !important; font-weight: 800; font-size: 13px; co
 <div class="company-header">
     <div class="company-logo-block">
         <div class="logo">Foot<span>Step</span>szs</div>
-        <div class="tagline">Premium Shoe Laundry — Malang</div>
+        <div class="tagline">Premium Shoe Laundry - Malang</div>
     </div>
     <div class="company-info-block">
         <strong>Footstepszs Boutique Gallery</strong>
@@ -87,7 +87,7 @@ tfoot td { background: #EDE9FE !important; font-weight: 800; font-size: 13px; co
     <div class="doc-title">Laporan Order Laundry</div>
     <div class="doc-period">
         Periode: <?= isset($tgl_start) && $tgl_start
-            ? date('d F Y', strtotime($tgl_start)) . ' — ' . date('d F Y', strtotime($tgl_end))
+            ? date('d F Y', strtotime($tgl_start)) . ' - ' . date('d F Y', strtotime($tgl_end))
             : date('F Y', strtotime($bulan.'-01')) ?>
     </div>
 </div>
@@ -150,7 +150,7 @@ tfoot td { background: #EDE9FE !important; font-weight: 800; font-size: 13px; co
     <div>
         Dicetak oleh: <strong><?= htmlspecialchars($admin_name) ?></strong><br>
         Waktu cetak: <?= $print_time ?><br>
-        Footstepszs © <?= date('Y') ?> — Data bersifat rahasia
+        Footstepszs © <?= date('Y') ?> - Data bersifat rahasia
     </div>
     <div style="text-align:right">
         <div class="page-info">Halaman 1 dari 1</div>

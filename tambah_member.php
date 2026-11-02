@@ -7,19 +7,24 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit;
 }
 
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nama = $_POST['nama'];
-    $no_hp = $_POST['no_hp'];
-    $tanggal_daftar = date('Y-m-d'); // Tanggal hari ini
+    $nama = htmlspecialchars(strip_tags(trim($_POST['nama'] ?? '')), ENT_QUOTES, 'UTF-8');
+    $no_hp = preg_replace('/[^0-9]/', '', trim($_POST['no_hp'] ?? ''));
+    $tanggal_daftar = date('Y-m-d');
     
-    $stmt = $conn->prepare("INSERT INTO members (nama, no_hp, tanggal_daftar) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $nama, $no_hp, $tanggal_daftar);
-    
-    if ($stmt->execute()) {
-        header("Location: member.php");
-        exit;
+    if (empty($nama) || strlen($no_hp) < 10 || strlen($no_hp) > 15) {
+        $error = "Nama wajib diisi dan nomor HP harus 10 - 15 digit angka.";
     } else {
-        $error = "Gagal menambah member!";
+        $stmt = $conn->prepare("INSERT INTO members (nama, no_hp, tanggal_daftar) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $nama, $no_hp, $tanggal_daftar);
+        
+        if ($stmt->execute()) {
+            header("Location: member.php");
+            exit;
+        } else {
+            $error = "Gagal menambah member: " . $conn->error;
+        }
     }
 }
 ?>
@@ -38,30 +43,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <main class="container main-content fade-in">
     <div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem;">
-            <h1>Add New Member</h1>
-            <a href="member.php" class="btn btn-outline">Back</a>
-        </div>
+        <h1>Add New Member</h1>
+        <a href="member.php" class="btn btn-outline">Back</a>
+    </div>
 
-        <div class="card" style="max-width: 600px;">
-            <?php if(isset($error)): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-            
-            <form action="" method="POST">
-                <div class="form-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" name="nama" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>No HP / WhatsApp</label>
-                    <input type="text" name="no_hp" class="form-control" required>
-                </div>
-                <div class="form-group" style="margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary">Simpan Member</button>
-                </div>
-            </form>
-        </div>
-    </main>
+    <div class="card" style="max-width: 600px;">
+        <?php if($error): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        
+        <form action="" method="POST">
+            <div class="form-group">
+                <label>Nama Lengkap *</label>
+                <input type="text" name="nama" class="form-control" required value="<?= htmlspecialchars($_POST['nama'] ?? '') ?>">
+            </div>
+            <div class="form-group">
+                <label>No HP / WhatsApp (Hanya Angka) *</label>
+                <input type="text" name="no_hp" class="form-control" placeholder="08xxxxxxxxxx" inputmode="numeric" pattern="[0-9]{10,15}" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required value="<?= htmlspecialchars($_POST['no_hp'] ?? '') ?>">
+            </div>
+            <div class="form-group" style="margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary">Simpan Member</button>
+            </div>
+        </form>
+    </div>
+</main>
 
 <footer class="site-footer">
     <div class="brand" style="font-size: 16px;">Foot<span class="step" style="color:var(--accent-color); font-family:Georgia, serif; font-size:1.2em; font-style:italic; margin:-4px 1px 0 1px;">Step</span>szs</div>
@@ -71,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <a href="#">SUSTAINABILITY</a>
         <a href="#">CONTACT US</a>
     </div>
-    <div>&copy; 2024 FOOTSTEPSZS BOUTIQUE GALLERY. ALL RIGHTS RESERVED.</div>
+    <div>&copy; <?= date('Y') ?> FOOTSTEPSZS BOUTIQUE GALLERY. ALL RIGHTS RESERVED.</div>
 </footer>
 
 </body>

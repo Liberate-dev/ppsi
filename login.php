@@ -15,19 +15,24 @@ $success_msg = '';
 //  REGISTER
 // =====================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'register') {
-    $nama   = trim($_POST['nama_lengkap']);
-    $email  = trim($_POST['email']);
-    $user   = trim($_POST['username']);
-    $hp     = trim($_POST['no_hp']);
-    $alamat = trim($_POST['alamat']);
-    $pass   = $_POST['password'];
-    $pass2  = $_POST['password2'];
+    $nama   = htmlspecialchars(strip_tags(trim($_POST['nama_lengkap'] ?? '')), ENT_QUOTES, 'UTF-8');
+    $email  = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+    $user   = preg_replace('/[^a-zA-Z0-9_]/', '', trim($_POST['username'] ?? ''));
+    $hp_raw = trim($_POST['no_hp'] ?? '');
+    $hp     = preg_replace('/[^0-9]/', '', $hp_raw);
+    $alamat = htmlspecialchars(strip_tags(trim($_POST['alamat'] ?? '')), ENT_QUOTES, 'UTF-8');
+    $pass   = $_POST['password'] ?? '';
+    $pass2  = $_POST['password2'] ?? '';
     $tab    = 'register';
 
     if (empty($nama) || empty($email) || empty($user) || empty($pass)) {
         $error = 'Semua field wajib diisi.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Format email tidak valid.';
+    } elseif (strlen($user) < 3 || strlen($user) > 30) {
+        $error = 'Username harus 3 - 30 karakter (huruf, angka, underscore).';
+    } elseif (!empty($hp) && (strlen($hp) < 10 || strlen($hp) > 15)) {
+        $error = 'Nomor HP/WA harus berupa 10 - 15 digit angka.';
     } elseif (strlen($pass) < 6) {
         $error = 'Password minimal 6 karakter.';
     } elseif ($pass !== $pass2) {
@@ -44,10 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             $ins  = $conn->prepare("INSERT INTO users (username, email, password, nama_lengkap, no_hp, alamat, role) VALUES (?, ?, ?, ?, ?, ?, 'customer')");
             $ins->bind_param("ssssss", $user, $email, $hash, $nama, $hp, $alamat);
             if ($ins->execute()) {
-                $success_msg = 'Akun berhasil dibuat! Silakan login.';
+                $success_msg = 'Akun berhasil dibuat! Silakan masuk dengan akun Anda.';
                 $tab = 'login';
             } else {
-                $error = 'Gagal membuat akun. Coba lagi.';
+                $error = 'Gagal membuat akun. Silakan coba kembali.';
             }
         }
     }
@@ -57,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 //  LOGIN
 // =====================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
-    $identifier = trim($_POST['identifier']); // email or username
-    $pass       = $_POST['password'];
+    $identifier = trim($_POST['identifier'] ?? '');
+    $pass       = $_POST['password'] ?? '';
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE (email = ? OR username = ?) LIMIT 1");
     $stmt->bind_param("ss", $identifier, $identifier);
@@ -90,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <link rel="shortcut icon" href="/favicon.svg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk / Daftar — Footstepszs</title>
+    <title>Masuk / Daftar - Footstepszs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -106,6 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             border-bottom: 2px solid transparent;
             margin-bottom: -2px;
             transition: var(--transition);
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
         }
         .auth-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
         .auth-panel { display: none; }
@@ -121,31 +130,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 Foot<span style="color:var(--primary);font-style:italic;font-family:Georgia,serif;font-size:36px;">Step</span>szs
             </a>
             <h2 style="font-size:2rem;color:white;font-weight:800;margin-bottom:1rem;line-height:1.2;">
-                Sepatu Bersih,<br>Hati Senang. ✨
+                Perawatan Sepatu & Tas Premium di Malang
             </h2>
             <p style="color:rgba(255,255,255,0.7);font-size:15px;line-height:1.7;margin-bottom:2.5rem;">
-                Laundry sepatu premium di Malang. Deep cleaning, unyellowing, repair — free pick up & delivery area Malang Kota.
+                Layanan laundry spesialis sepatu, tas, dan topi. Deep cleaning, unyellowing, dan repair dengan standar higienis dan bahan material terbaik. Free pick up & delivery area Malang Kota.
             </p>
             <div style="display:flex;flex-direction:column;gap:1rem;">
-                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.8);font-size:14px;">
-                    <span style="width:32px;height:32px;background:rgba(124,58,237,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span>
+                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.85);font-size:14px;">
+                    <span style="width:28px;height:28px;background:rgba(124,58,237,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-weight:700;">✓</span>
                     Free Pick Up & Delivery Malang Kota
                 </div>
-                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.8);font-size:14px;">
-                    <span style="width:32px;height:32px;background:rgba(124,58,237,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span>
-                    Tracking order & estimasi waktu
+                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.85);font-size:14px;">
+                    <span style="width:28px;height:28px;background:rgba(124,58,237,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-weight:700;">✓</span>
+                    Pelacakan status pengerjaan secara real-time
                 </div>
-                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.8);font-size:14px;">
-                    <span style="width:32px;height:32px;background:rgba(124,58,237,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span>
-                    Program member bulanan hemat
+                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.85);font-size:14px;">
+                    <span style="width:28px;height:28px;background:rgba(124,58,237,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-weight:700;">✓</span>
+                    Program membership hemat hingga 15%
                 </div>
-                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.8);font-size:14px;">
-                    <span style="width:32px;height:32px;background:rgba(124,58,237,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span>
-                    Laporan foto before & after
+                <div style="display:flex;align-items:center;gap:0.75rem;color:rgba(255,255,255,0.85);font-size:14px;">
+                    <span style="width:28px;height:28px;background:rgba(124,58,237,0.3);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-weight:700;">✓</span>
+                    Dokumentasi foto awal (Tanda Terima 1) & laporan hasil
                 </div>
             </div>
             <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);">
-                <div style="font-size:13px;color:rgba(255,255,255,0.5);">Kontak: 089681276080 • @footstepszs</div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.5);">Kontak: 089681276080 | @footstepszs</div>
             </div>
         </div>
     </div>
@@ -155,20 +164,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <div class="auth-box">
             <!-- TABS -->
             <div class="auth-tabs">
-                <button class="auth-tab <?= $tab === 'login' ? 'active' : '' ?>" onclick="switchTab('login')">Masuk</button>
-                <button class="auth-tab <?= $tab === 'register' ? 'active' : '' ?>" onclick="switchTab('register')">Daftar</button>
+                <button type="button" class="auth-tab <?= $tab === 'login' ? 'active' : '' ?>" onclick="switchTab('login')">Masuk</button>
+                <button type="button" class="auth-tab <?= $tab === 'register' ? 'active' : '' ?>" onclick="switchTab('register')">Daftar</button>
             </div>
 
             <?php if ($error): ?>
-                <div class="alert alert-danger" data-auto-close>⚠️ <?= htmlspecialchars($error) ?></div>
+                <div class="alert alert-danger" data-auto-close><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
             <?php if ($success_msg): ?>
-                <div class="alert alert-success" data-auto-close>✅ <?= htmlspecialchars($success_msg) ?></div>
+                <div class="alert alert-success" data-auto-close><?= htmlspecialchars($success_msg) ?></div>
             <?php endif; ?>
 
             <!-- LOGIN FORM -->
             <div class="auth-panel <?= $tab === 'login' ? 'active' : '' ?>" id="panelLogin">
-                <h2 class="auth-title">Selamat Datang!</h2>
+                <h2 class="auth-title">Selamat Datang</h2>
                 <p class="auth-subtitle">Masuk ke akun Footstepszs kamu.</p>
                 <form method="POST">
                     <input type="hidden" name="action" value="login">
@@ -178,9 +187,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        <input type="password" name="password" class="form-control" placeholder="Password akun" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 btn-lg">Masuk →</button>
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">Masuk</button>
                 </form>
                 <div class="auth-footer">
                     Belum punya akun? <a href="#" onclick="switchTab('register')" style="color:var(--primary);font-weight:600;">Daftar sekarang</a>
@@ -190,30 +199,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <!-- REGISTER FORM -->
             <div class="auth-panel <?= $tab === 'register' ? 'active' : '' ?>" id="panelRegister">
                 <h2 class="auth-title">Buat Akun Baru</h2>
-                <p class="auth-subtitle">Gratis! Daftar dan mulai order pertamamu.</p>
+                <p class="auth-subtitle">Daftar untuk mulai memesan layanan laundry sepatu.</p>
                 <form method="POST">
                     <input type="hidden" name="action" value="register">
                     <div class="form-group">
                         <label class="form-label">Nama Lengkap *</label>
-                        <input type="text" name="nama_lengkap" class="form-control" placeholder="Nama Lengkap" required>
+                        <input type="text" name="nama_lengkap" class="form-control" placeholder="Nama Lengkap" required value="<?= htmlspecialchars($_POST['nama_lengkap'] ?? '') ?>">
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
                         <div class="form-group">
                             <label class="form-label">Username *</label>
-                            <input type="text" name="username" class="form-control" placeholder="username" required>
+                            <input type="text" name="username" class="form-control" placeholder="username" required value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">No HP / WA *</label>
-                            <input type="text" name="no_hp" class="form-control" placeholder="08xxxx">
+                            <label class="form-label">No HP / WA (Angka) *</label>
+                            <input type="text" name="no_hp" class="form-control" placeholder="08xxxxxxxxxx" inputmode="numeric" pattern="[0-9]{10,15}" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required value="<?= htmlspecialchars($_POST['no_hp'] ?? '') ?>">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email *</label>
-                        <input type="email" name="email" class="form-control" placeholder="email@example.com" required>
+                        <input type="email" name="email" class="form-control" placeholder="email@example.com" required value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Alamat (untuk Pick Up)</label>
-                        <textarea name="alamat" class="form-control" placeholder="Alamat lengkap..." rows="2"></textarea>
+                        <label class="form-label">Alamat Lengkap</label>
+                        <textarea name="alamat" class="form-control" placeholder="Alamat untuk pick up & delivery..." rows="2"><?= htmlspecialchars($_POST['alamat'] ?? '') ?></textarea>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
                         <div class="form-group">
@@ -221,11 +230,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <input type="password" name="password" class="form-control" placeholder="Min. 6 karakter" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Konfirmasi *</label>
+                            <label class="form-label">Konfirmasi Password *</label>
                             <input type="password" name="password2" class="form-control" placeholder="Ulangi password" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 btn-lg">Daftar Gratis →</button>
+                    <button type="submit" class="btn btn-primary w-100 btn-lg">Daftar Akun</button>
                 </form>
                 <div class="auth-footer">
                     Sudah punya akun? <a href="#" onclick="switchTab('login')" style="color:var(--primary);font-weight:600;">Masuk sekarang</a>

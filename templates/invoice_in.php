@@ -8,7 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nota Masuk — <?= htmlspecialchars($order['kode_order']) ?></title>
+<title>Nota Masuk - <?= htmlspecialchars($order['kode_order']) ?></title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -21,8 +21,8 @@
     .company-info { font-size: 13px; color: #6B7280; }
     
     .title-box { background: #F9FAFB; padding: 15px 30px; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; }
-    .nota-title { font-size: 18px; font-weight: 800; color: #7C3AED; text-transform: uppercase; letter-spacing: 1px; }
-    .badge-in { background: #FEF3C7; color: #92400E; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .nota-title { font-size: 16px; font-weight: 800; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-in { background: #EDE9FE; color: #5B21B6; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     
     .content { padding: 30px; }
     
@@ -41,16 +41,17 @@
     .photo-box h4 { font-size: 13px; color: #4B5563; margin-bottom: 10px; }
     .photo-box img { max-width: 100%; max-height: 250px; border-radius: 6px; border: 1px solid #E5E7EB; object-fit: cover; }
     
+    .instruction-box { font-size: 13px; padding: 14px; border-radius: 8px; margin-top: 15px; }
+    .instruction-bank { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E3A8A; }
+    .instruction-qris { background: #FDF2F8; border: 1px solid #FBCFE8; color: #831843; text-align: center; }
+    .instruction-cod { background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; }
+
     .footer { padding: 20px 30px; background: #F9FAFB; border-top: 1px solid #E5E7EB; text-align: center; font-size: 12px; color: #6B7280; }
     
     @media (max-width: 480px) {
         .info-grid { grid-template-columns: 1fr; gap: 15px; }
         .nota-container { border-radius: 0; }
         body { padding: 0; }
-    }
-    @media print {
-        body { background: white; padding: 0; }
-        .nota-container { box-shadow: none; border-top: none; max-width: 100%; }
     }
 </style>
 </head>
@@ -61,13 +62,13 @@
         <div class="logo">Foot<span>Step</span>szs</div>
         <div class="company-info">
             Jl. Cluster Tigris Raya No. 29, Malang<br>
-            WA: 089681276080 | IG: @footstepszs
+            WhatsApp: 089681276080 | Instagram: @footstepszs
         </div>
     </div>
     
     <div class="title-box">
-        <div class="nota-title">NOTA PESANAN</div>
-        <div class="badge-in">ORDER MASUK</div>
+        <div class="nota-title">Nota Pesanan Masuk</div>
+        <div class="badge-in"><?= strtoupper(htmlspecialchars($order['metode_pembayaran'] ?? 'COD')) ?><?= (($order['status_pembayaran'] ?? '') === 'Lunas') ? ' - LUNAS' : '' ?></div>
     </div>
     
     <div class="content">
@@ -81,14 +82,14 @@
                 <p><?= date('d F Y, H:i', strtotime($order['tanggal_order'])) ?></p>
             </div>
             <div class="info-box">
-                <h4>Informasi Pelanggan</h4>
+                <h4>Pelanggan</h4>
                 <p><?= htmlspecialchars($order['nama_lengkap']) ?></p>
                 <p class="light"><?= htmlspecialchars($order['no_hp']) ?></p>
             </div>
             <div class="info-box" style="text-align: right;">
                 <h4>Layanan & Estimasi</h4>
                 <p><?= htmlspecialchars($order['jenis_waktu']) ?></p>
-                <p class="light">Selesai: <?= date('d F Y', strtotime($order['tanggal_estimasi'])) ?></p>
+                <p class="light">Estimasi Selesai: <?= date('d F Y', strtotime($order['tanggal_estimasi'])) ?></p>
             </div>
         </div>
         
@@ -113,8 +114,14 @@
                 <?php endforeach; ?>
             </tbody>
             <tfoot>
+                <?php if (!empty($order['diskon_member']) && $order['diskon_member'] > 0): ?>
                 <tr>
-                    <td colspan="2" style="text-align:right">TOTAL PEMBAYARAN</td>
+                    <td colspan="2" style="text-align:right;font-size:13px;font-weight:600;color:#059669">Potongan Diskon Member (<?= htmlspecialchars($order['tier_member'] ?? '') ?>)</td>
+                    <td style="text-align:right;font-size:13px;font-weight:600;color:#059669">- Rp <?= number_format($order['diskon_member'], 0, ',', '.') ?></td>
+                </tr>
+                <?php endif; ?>
+                <tr>
+                    <td colspan="2" style="text-align:right">TOTAL TAGIHAN</td>
                     <td style="text-align:right">Rp <?= number_format($order['total_harga'], 0, ',', '.') ?></td>
                 </tr>
             </tfoot>
@@ -122,7 +129,7 @@
         
         <?php if (!empty($foto_awal_urls) && is_array($foto_awal_urls)): ?>
         <div class="photo-box">
-            <h4>📸 Kondisi Awal Saat Diserahkan</h4>
+            <h4>Dokumentasi Kondisi Awal</h4>
             <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px;">
                 <?php foreach ($foto_awal_urls as $idx => $url): ?>
                     <div style="text-align: center;">
@@ -134,18 +141,48 @@
         </div>
         <?php elseif (!empty($foto_awal_url)): ?>
         <div class="photo-box">
-            <h4>📸 Kondisi Awal Saat Diserahkan</h4>
-            <img src="<?= htmlspecialchars($foto_awal_url) ?>" alt="Foto Awal Sepatu">
+            <h4>Dokumentasi Kondisi Awal</h4>
+            <img src="<?= htmlspecialchars($foto_awal_url) ?>" alt="Foto Awal">
         </div>
-        <?php endif; ?>        
-        <div style="font-size:12px; color:#4B5563; background:#FEF3C7; padding:12px; border-radius:6px; border-left:4px solid #F59E0B;">
-            <strong>Catatan:</strong> Pembayaran dilakukan saat barang selesai dan diserahkan/dikirim kembali ke tangan Anda. Simpan nota ini (digital) sebagai bukti pemesanan.
-        </div>
+        <?php endif; ?>
+
+        <?php 
+        $metode = $order['metode_pembayaran'] ?? 'COD';
+        $is_lunas = (($order['status_pembayaran'] ?? '') === 'Lunas');
+
+        if ($is_lunas):
+        ?>
+            <div class="instruction-box" style="background:#ECFDF5; border:1px solid #A7F3D0; color:#065F46; padding:12px; border-radius:8px; margin-top:15px; font-size:12px;">
+                <strong style="color:#047857; font-size:13px;">Status Pembayaran: LUNAS</strong><br>
+                <?php if (($order['metode_pembayaran'] ?? '') === 'Kuota Member' || (float)$order['total_harga'] <= 0): ?>
+                    Tagihan cuci pesanan ini dicover 100% oleh <strong>Kuota Bulanan Member <?= htmlspecialchars($order['tier_member'] ?? '') ?></strong>. Pesanan langsung diteruskan ke proses pencucian.
+                <?php else: ?>
+                    Pembayaran <?= htmlspecialchars($metode) ?> telah diverifikasi lunas. Pesanan diteruskan ke proses pencucian.
+                <?php endif; ?>
+            </div>
+        <?php elseif ($metode === 'Transfer Bank'): ?>
+            <div class="instruction-box instruction-bank">
+                <strong>Instruksi Pembayaran Transfer:</strong><br>
+                Bank BCA: <strong>1234-5678-90</strong> a.n. <strong>Footstepszs Studio</strong><br>
+                Total: <strong>Rp <?= number_format($order['total_harga'], 0, ',', '.') ?></strong><br>
+                <em>Batas waktu pembayaran 24 jam dari waktu submit order. Harap konfirmasi via WhatsApp setelah transfer.</em>
+            </div>
+        <?php elseif ($metode === 'QRIS'): ?>
+            <div class="instruction-box instruction-qris">
+                <strong>Scan Pembayaran QRIS:</strong><br>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=<?= urlencode("QRIS_FOOTSTEPSZS_" . $order['kode_order']) ?>" alt="QRIS" style="margin: 10px auto; display: block; border-radius: 8px;">
+                <em>Dapat di-scan via GoPay, OVO, Dana, ShopeePay, BCA, atau mobile banking lainnya. Batas waktu: 24 jam.</em>
+            </div>
+        <?php else: ?>
+            <div class="instruction-box instruction-cod">
+                <strong>Metode Pembayaran COD:</strong> Pembayaran tunai saat penjemputan atau pengantaran barang oleh kurir Footstepszs.
+            </div>
+        <?php endif; ?>
     </div>
     
     <div class="footer">
         Diterima oleh sistem otomatis Footstepszs<br>
-        Waktu Cetak: <?= date('d M Y, H:i:s') ?>
+        Waktu Cetak: <?= date('d M Y, H:i:s') ?> WIB
     </div>
 </div>
 

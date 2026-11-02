@@ -22,7 +22,7 @@ if ($resNotif) {
     <link rel="shortcut icon" href="/favicon.svg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle ?? 'Admin') ?> — Footstepszs Admin</title>
+    <title><?= htmlspecialchars($pageTitle ?? 'Admin') ?> - Footstepszs Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -51,10 +51,14 @@ if ($resNotif) {
             <?php endif; ?>
         </a>
 
-        <div class="sidebar-section-label">Pelanggan</div>
+        <div class="sidebar-section-label">Pelanggan & Member</div>
         <a href="/admin/customers.php" class="sidebar-link <?= ($activePage??'')==='customers' ? 'active' : '' ?>">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
             Akun Customer
+        </a>
+        <a href="/admin/members.php" class="sidebar-link <?= ($activePage??'')==='members' ? 'active' : '' ?>">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            Member Bulanan
         </a>
 
         <div class="sidebar-section-label">Keuangan</div>
@@ -108,8 +112,8 @@ if ($resNotif) {
         </div>
         <div class="admin-topbar-right">
             <div style="position:relative;">
-                <button class="topbar-notif-btn" id="notifBtn" title="Notifikasi">
-                    🔔
+                <button class="topbar-notif-btn" id="notifBtn" title="Notifikasi" style="display:inline-flex;align-items:center;justify-content:center;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;stroke:var(--navy);"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     <span class="topbar-notif-badge" id="adminNotifBadge" style="display:<?= $unreadCount > 0 ? 'flex' : 'none' ?>"><?= $unreadCount ?></span>
                 </button>
                 <div class="notif-dropdown" id="notifDropdown">
@@ -122,7 +126,9 @@ if ($resNotif) {
                             <div style="padding:2rem;text-align:center;color:#9CA3AF;font-size:14px;">Tidak ada notifikasi baru.</div>
                         <?php else: foreach ($notifRows as $n): ?>
                             <div class="notif-item <?= ($n['is_read'] ?? 1) == 0 ? 'unread' : '' ?>">
-                                <div class="notif-item-icon">🔔</div>
+                                <div class="notif-item-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;stroke:var(--primary);"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                </div>
                                 <div>
                                     <div class="notif-item-text"><?= htmlspecialchars($n['pesan']) ?></div>
                                     <div class="notif-item-time"><?= $n['fmt_time'] ?></div>
@@ -132,7 +138,7 @@ if ($resNotif) {
                     </div>
                 </div>
             </div>
-            <a href="/index.php" class="btn btn-outline btn-sm">Lihat Website ↗</a>
+            <a href="/index.php" class="btn btn-outline btn-sm">Lihat Website</a>
         </div>
     </header>
     <main class="admin-main">
@@ -151,6 +157,21 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.addEventListener('click', function() {
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
+        });
+    }
+
+    // Toggle notif dropdown
+    var notifBtn = document.getElementById('notifBtn');
+    var notifDropdown = document.getElementById('notifDropdown');
+    if (notifBtn && notifDropdown) {
+        notifBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notifDropdown.style.display = notifDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!notifDropdown.contains(e.target)) {
+                notifDropdown.style.display = 'none';
+            }
         });
     }
 });

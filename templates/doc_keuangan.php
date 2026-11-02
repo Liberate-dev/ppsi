@@ -1,7 +1,7 @@
 <?php
 /**
  * templates/doc_keuangan.php
- * Laporan Keuangan — dengan identitas perusahaan, footer pencetak, timestamp
+ * Laporan Keuangan - dengan identitas perusahaan, footer pencetak, timestamp
  */
 $admin_name = $adminName ?? $_SESSION['nama'] ?? 'Administrator';
 $page_total = 1; // single page
@@ -11,7 +11,7 @@ $print_time = date('d F Y, H:i:s');
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Laporan Keuangan — <?= isset($tgl_start) && $tgl_start ? date('d M Y', strtotime($tgl_start)).' - '.date('d M Y', strtotime($tgl_end)) : date('F Y', strtotime($bulan.'-01')) ?></title>
+<title>Laporan Keuangan - <?= isset($tgl_start) && $tgl_start ? date('d M Y', strtotime($tgl_start)).' - '.date('d M Y', strtotime($tgl_end)) : date('F Y', strtotime($bulan.'-01')) ?></title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; padding: 2.5rem; color: #1a1a1a; font-size: 13px; }
@@ -86,7 +86,7 @@ tr:nth-child(even) td { background: #F9FAFB; }
 <div class="company-header">
     <div class="company-logo-block">
         <div class="logo">Foot<span>Step</span>szs</div>
-        <div class="tagline">Premium Shoe Laundry — Malang</div>
+        <div class="tagline">Premium Shoe Laundry - Malang</div>
     </div>
     <div class="company-info-block">
         <strong>Footstepszs Boutique Gallery</strong>
@@ -102,7 +102,7 @@ tr:nth-child(even) td { background: #F9FAFB; }
     <div class="doc-title">Laporan Keuangan</div>
     <div class="doc-period">
         Periode: <?= isset($tgl_start) && $tgl_start
-            ? date('d F Y', strtotime($tgl_start)) . ' — ' . date('d F Y', strtotime($tgl_end))
+            ? date('d F Y', strtotime($tgl_start)) . ' - ' . date('d F Y', strtotime($tgl_end))
             : date('F Y', strtotime($bulan.'-01')) ?>
     </div>
 </div>
@@ -169,7 +169,7 @@ tr:nth-child(even) td { background: #F9FAFB; }
     <div class="footer-left">
         Dicetak oleh: <strong><?= htmlspecialchars($admin_name) ?></strong><br>
         Waktu cetak: <?= $print_time ?><br>
-        Footstepszs © <?= date('Y') ?> — Semua data bersifat rahasia
+        Footstepszs © <?= date('Y') ?> - Semua data bersifat rahasia
     </div>
     <div class="footer-right">
         <div class="page-info">Halaman <?= $page_now ?> dari <?= $page_total ?></div>

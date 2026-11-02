@@ -1,7 +1,7 @@
 <?php
 /**
  * templates/doc_member.php
- * Laporan Daftar Member — identitas perusahaan, footer pencetak, timestamp
+ * Laporan Daftar Member - identitas perusahaan, footer pencetak, timestamp
  */
 $admin_name = $adminName ?? $_SESSION['nama'] ?? 'Administrator';
 $print_time = date('d F Y, H:i:s');
@@ -11,7 +11,7 @@ $aktif = count(array_filter($rows, fn($r) => $r['status'] === 'Aktif'));
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Laporan Member — Footstepszs</title>
+<title>Laporan Member - Footstepszs</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Arial, sans-serif; padding: 2.5rem; color: #1a1a1a; font-size: 13px; }
@@ -72,7 +72,7 @@ tr:nth-child(even) td { background: #F9FAFB; }
 <div class="company-header">
     <div class="company-logo-block">
         <div class="logo">Foot<span>Step</span>szs</div>
-        <div class="tagline">Premium Shoe Laundry — Malang</div>
+        <div class="tagline">Premium Shoe Laundry - Malang</div>
     </div>
     <div class="company-info-block">
         <strong>Footstepszs Boutique Gallery</strong>
@@ -150,7 +150,7 @@ tr:nth-child(even) td { background: #F9FAFB; }
     <div>
         Dicetak oleh: <strong><?= htmlspecialchars($admin_name) ?></strong><br>
         Waktu cetak: <?= $print_time ?><br>
-        Footstepszs © <?= date('Y') ?> — Data bersifat rahasia
+        Footstepszs © <?= date('Y') ?> - Data bersifat rahasia
     </div>
     <div style="text-align:right">
         <div class="page-info">Halaman 1 dari 1</div>

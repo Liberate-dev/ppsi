@@ -826,7 +826,61 @@ h1, h2, h3, h4, h5, h6 {
 }
 .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 .form-control::placeholder { color: var(--text-light); }
-select.form-control { cursor: pointer; }
+select.form-control {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: var(--white);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234B5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 14px 14px;
+    padding-right: 2.25rem !important;
+}
+
+/* Item Card Responsive Component */
+.order-item-card {
+    background: #F9FAFB;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+}
+.order-item-card:hover {
+    border-color: #D1D5DB;
+    background: #FFFFFF;
+}
+.order-item-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--gray-200);
+}
+.order-item-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+}
+.order-item-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1.8fr 0.8fr 1.2fr;
+    gap: 1rem;
+    align-items: flex-end;
+}
+@media (max-width: 768px) {
+    .order-item-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 500px) {
+    .order-item-grid {
+        grid-template-columns: 1fr;
+    }
+}
 textarea.form-control { resize: vertical; min-height: 100px; }
 
 .input-group { display: flex; gap: 0; }
@@ -1149,7 +1203,11 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     white-space: nowrap;
 }
 .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.badge-menunggu   { background: #FEF3C7; color: #92400E; }
+.badge-menunggu         { background: #FEF3C7; color: #92400E; }
+.badge-pendingpayment  { background: #FEF3C7; color: #92400E; }
+.badge-cuci            { background: #E0E7FF; color: #3730A3; }
+.badge-kering          { background: #EDE9FE; color: #5B21B6; }
+.badge-siapkirim       { background: #CFFAFE; color: #155E75; }
 .badge-diterima   { background: #DBEAFE; color: #1E40AF; }
 .badge-proses     { background: #EDE9FE; color: #5B21B6; }
 .badge-selesai    { background: #D1FAE5; color: #065F46; }

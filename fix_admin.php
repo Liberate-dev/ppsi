@@ -9,8 +9,7 @@ if ($stmt->execute()) {
     echo "New hash: $hash\n";
     // Verify
     $check = $conn->query("SELECT password FROM users WHERE username='admin'")->fetch_assoc();
-    echo "Verify: " . (password_verify('admin123', $check['password']) ? "✅ CORRECT!" : "❌ WRONG!") . "\n";
+    echo "Verify: " . (password_verify('admin123', $check['password']) ? "[OK] CORRECT" : "[FAIL] WRONG") . "\n";
 } else {
     echo "Error: " . $conn->error . "\n";
 }
-?>

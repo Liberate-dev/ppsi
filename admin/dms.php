@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate'])) {
     if ($content) {
         file_put_contents($full_path, $content);
         $fp_stored = 'uploads/documents/' . $file_path;
-        $ket = "Dicetak oleh: $adminName | Generated: $gen_type — " . ($tgl_start ?: $bulan);
+        $ket = "Dicetak oleh: $adminName | Generated: $gen_type - " . ($tgl_start ?: $bulan);
         $ref_type_val = ($gen_type === 'keuangan_report') ? 'keuangan' : ($gen_type === 'member_report' ? 'member' : 'order');
         
         $ins = $conn->prepare("INSERT INTO documents (ref_type, ref_id, nama_dokumen, jenis, file_path, keterangan, tanggal, created_by) VALUES (?, ?, ?, 'Generated', ?, ?, CURDATE(), ?)");
@@ -246,7 +246,7 @@ $documents = [];
 $res_d = $conn->query($sql);
 while($row = $res_d->fetch_assoc()) { $documents[] = $row; }
 
-$pageTitle = 'DMS — Manajemen Dokumen';
+$pageTitle = 'DMS - Manajemen Dokumen';
 $activePage = 'dms';
 include __DIR__ . '/../includes/admin_header.php';
 ?>
@@ -273,7 +273,7 @@ include __DIR__ . '/../includes/admin_header.php';
 <div class="dms-wrapper">
     <div class="dms-sidebar">
         <div class="card" style="margin-bottom:1.5rem;">
-            <h3 style="font-size:15px;margin-bottom:1rem;">📤 Upload Dokumen</h3>
+            <h3 style="font-size:15px;margin-bottom:1rem;">Upload Dokumen</h3>
             <form method="POST" enctype="multipart/form-data" action="dms.php">
                 <div class="form-group">
                     <label class="form-label">Nama Dokumen</label>
@@ -311,13 +311,13 @@ include __DIR__ . '/../includes/admin_header.php';
                     <label class="form-label" style="margin-bottom: 8px; display: block; font-weight: 600;">Metode Dokumen</label>
                     <div style="display:flex;gap:15px;flex-wrap:wrap;">
                         <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
-                            <input type="radio" name="input_method" value="upload" checked onchange="toggleUploadMethod()"> 📤 Upload File
+                            <input type="radio" name="input_method" value="upload" checked onchange="toggleUploadMethod()"> Upload File
                         </label>
                         <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
-                            <input type="radio" name="input_method" value="template" onchange="toggleUploadMethod()"> 📝 Gunakan Template
+                            <input type="radio" name="input_method" value="template" onchange="toggleUploadMethod()"> Gunakan Template
                         </label>
                         <label style="cursor:pointer; display:flex; align-items:center; gap:5px;">
-                            <input type="radio" name="input_method" value="link" onchange="toggleUploadMethod()"> 🔗 Masukkan Link
+                            <input type="radio" name="input_method" value="link" onchange="toggleUploadMethod()"> Masukkan Link
                         </label>
                     </div>
                 </div>
@@ -355,7 +355,7 @@ include __DIR__ . '/../includes/admin_header.php';
         </div>
 
         <div class="card">
-            <h3 style="font-size:15px;margin-bottom:0.25rem;">⚡ Generate Dokumen Otomatis</h3>
+            <h3 style="font-size:15px;margin-bottom:0.25rem;">Generate Dokumen Otomatis</h3>
             <form method="POST" action="dms.php">
                 <div class="form-group">
                     <label class="form-label">Nama Dokumen</label>
@@ -364,8 +364,8 @@ include __DIR__ . '/../includes/admin_header.php';
                 <div class="form-group">
                     <label class="form-label">Jenis Laporan</label>
                     <select name="gen_type" class="form-control" id="genType" onchange="toggleGenOptions()">
-                        <option value="keuangan_report">📊 Laporan Keuangan Bulanan</option>
-                        <option value="order_report">📦 Laporan Order Bulanan</option>
+                        <option value="keuangan_report">Laporan Keuangan Bulanan</option>
+                        <option value="order_report">Laporan Order Bulanan</option>
                     </select>
                 </div>
                 <button type="submit" name="generate" class="btn btn-primary w-100">Generate & Simpan</button>
@@ -376,17 +376,17 @@ include __DIR__ . '/../includes/admin_header.php';
     <div class="dms-main">
         <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
-                <h3 style="font-size:16px;margin:0;">📂 Daftar Dokumen (<?= count($documents) ?>)</h3>
+                <h3 style="font-size:16px;margin:0;">Daftar Dokumen (<?= count($documents) ?>)</h3>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                     <a href="?ref=all" class="btn <?= $filter_ref==='all'?'btn-primary':'btn-outline' ?> btn-sm">Semua</a>
                     <a href="?ref=order" class="btn <?= $filter_ref==='order'?'btn-primary':'btn-outline' ?> btn-sm">Order</a>
                     <a href="?ref=keuangan" class="btn <?= $filter_ref==='keuangan'?'btn-primary':'btn-outline' ?> btn-sm">Keuangan</a>
-                    <a href="?ref=tanda_terima" class="btn <?= $filter_ref==='tanda_terima'?'btn-primary':'btn-outline' ?> btn-sm">📸 Tanda Terima</a>
+                    <a href="?ref=tanda_terima" class="btn <?= $filter_ref==='tanda_terima'?'btn-primary':'btn-outline' ?> btn-sm">Tanda Terima</a>
                 </div>
             </div>
 
-            <?php if ($success): ?><div class="alert alert-success" data-auto-close>✅ <?= htmlspecialchars($success) ?></div><?php endif; ?>
-            <?php if ($error):   ?><div class="alert alert-danger"  data-auto-close>⚠️ <?= htmlspecialchars($error) ?></div><?php endif; ?>
+            <?php if ($success): ?><div class="alert alert-success" data-auto-close><?= htmlspecialchars($success) ?></div><?php endif; ?>
+            <?php if ($error):   ?><div class="alert alert-danger"  data-auto-close><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
             <div style="overflow-x:auto; background:#fff; border-radius:5px;">
                 <table class="data-table" style="font-size:13px; width:100%; min-width:650px;">
@@ -406,17 +406,17 @@ include __DIR__ . '/../includes/admin_header.php';
                                          onclick="window.open('/<?= htmlspecialchars($doc['file_path']) ?>','_blank')"
                                          alt="Preview">
                                 <?php elseif ($doc['jenis'] === 'Generated'): ?>
-                                    <div style="width:52px;height:52px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;">📄</div>
+                                    <div style="width:52px;height:52px;background:var(--primary-light);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;stroke:var(--primary);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
                                 <?php elseif ($doc['jenis'] === 'Link'): ?>
-                                    <div style="width:52px;height:52px;background:#DBEAFE;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;">🔗</div>
+                                    <div style="width:52px;height:52px;background:#DBEAFE;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;stroke:#2563EB;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
                                 <?php else: ?>
-                                    <div style="width:52px;height:52px;background:var(--gray-100);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;">📎</div>
+                                    <div style="width:52px;height:52px;background:var(--gray-100);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;stroke:#6B7280;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></div>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <div style="font-weight:600"><?= htmlspecialchars($doc['nama_dokumen']) ?></div>
                                 <?php if ($is_tt): ?>
-                                    <span style="font-size:10px;background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:10px;font-weight:700;">📸 Tanda Terima</span>
+                                    <span style="font-size:10px;background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:10px;font-weight:700;">Tanda Terima</span>
                                 <?php endif; ?>
                                 <?php if ($doc['keterangan']): ?>
                                     <small style="color:#9CA3AF;display:block;margin-top:3px;"><?= htmlspecialchars(substr($doc['keterangan'],0,60)) . (strlen($doc['keterangan'])>60?'...':'') ?></small>
@@ -433,9 +433,9 @@ include __DIR__ . '/../includes/admin_header.php';
                             <td>
                                 <div style="display:flex;gap:4px;flex-wrap:wrap;min-width:100px;">
                                     <?php if ($doc['jenis'] === 'Link'): ?>
-                                        <a href="<?= htmlspecialchars($doc['file_path']) ?>" target="_blank" class="btn btn-outline btn-sm">🔗 Buka</a>
+                                        <a href="<?= htmlspecialchars($doc['file_path']) ?>" target="_blank" class="btn btn-outline btn-sm">Buka Link</a>
                                     <?php else: ?>
-                                        <a href="/<?= htmlspecialchars($doc['file_path']) ?>" target="_blank" class="btn btn-outline btn-sm">👁 View</a>
+                                        <a href="/<?= htmlspecialchars($doc['file_path']) ?>" target="_blank" class="btn btn-outline btn-sm">Lihat Dokumen</a>
                                     <?php endif; ?>
                                     <a href="?del=<?= $doc['id'] ?>&ref=<?= $filter_ref ?>" class="btn btn-danger btn-sm" data-confirm="Hapus dokumen ini?">Hapus</a>
                                 </div>

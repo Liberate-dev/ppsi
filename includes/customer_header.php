@@ -19,7 +19,7 @@ $current = basename($_SERVER['PHP_SELF']);
     <link rel="shortcut icon" href="/favicon.svg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?> — Footstepszs</title>
+    <title><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?> - Footstepszs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap"
@@ -89,7 +89,7 @@ $current = basename($_SERVER['PHP_SELF']);
                 <div
                     style="background:<?= $memberInfo ? 'linear-gradient(135deg,#' . ($memberInfo['level'] === 'Gold' ? '92400E,#D97706' : ($memberInfo['level'] === 'Silver' ? '374151,#6B7280' : '5B21B6,#7C3AED')) . ')' : 'rgba(255,255,255,0.06)' ?>;border-radius:12px;padding:1rem;text-align:center;">
                     <?php if ($memberInfo): ?>
-                        <div style="font-size:1.5rem;font-weight:900;color:white;"><?= $memberInfo['level'] ?></div>
+                        <div style="font-size:1.5rem;font-weight:900;color:white;"><?= htmlspecialchars($memberInfo['level']) ?></div>
                         <div style="font-size:11px;color:rgba(255,255,255,0.7);">Member Aktif</div>
                         <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px">s/d
                             <?= date('d M Y', strtotime($memberInfo['tanggal_selesai'])) ?></div>
@@ -97,7 +97,7 @@ $current = basename($_SERVER['PHP_SELF']);
                         <div style="font-size:12px;color:rgba(255,255,255,0.5);">Belum Member</div>
                         <a href="/customer/membership.php"
                             style="display:block;margin-top:6px;font-size:11px;font-weight:700;color:var(--primary);">Daftar
-                            Member →</a>
+                            Member &rarr;</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -129,6 +129,14 @@ $current = basename($_SERVER['PHP_SELF']);
                         <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
                     </svg>
                     Riwayat Order
+                </a>
+                <a href="/customer/membership.php"
+                    class="sidebar-link <?= $current == 'membership.php' ? 'active' : '' ?>">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="8" r="7" />
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                    </svg>
+                    Membership
                 </a>
             </nav>
 
@@ -166,12 +174,12 @@ $current = basename($_SERVER['PHP_SELF']);
                     </button>
                     <div>
                         <div class="admin-page-title"><?= htmlspecialchars($pageTitle ?? 'Dashboard') ?></div>
-                        <div class="admin-breadcrumb">Footstepszs · <?= htmlspecialchars($custName) ?></div>
+                        <div class="admin-breadcrumb">Footstepszs &middot; <?= htmlspecialchars($custName) ?></div>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;gap:0.75rem;">
                     <a href="/customer/order.php" class="btn btn-primary btn-sm">+ Pesan Sekarang</a>
-                    <a href="/index.php" class="btn btn-outline btn-sm">🏠 Beranda</a>
+                    <a href="/index.php" class="btn btn-outline btn-sm">Beranda</a>
                 </div>
             </header>
             <main class="admin-main">

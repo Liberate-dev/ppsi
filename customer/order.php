@@ -42,26 +42,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $TREAT_EXTRA = ['Deep Cleaning' => 0, 'Unyellowing' => 10000, 'Repair' => 20000];
             $FAST_EXTRA  = ($jenis_waktu === 'Fast Clean') ? 10000 : 0;
 
+            $qDetails = getMemberQuotaDetails($conn, $userId);
+            $isMember = $qDetails['is_member'];
+            $memberTier = $qDetails['tier'];
+            $remainingQuota = $qDetails['remaining_quota'];
+            $discountPercent = $qDetails['discount_percent'];
+            $quotaPool = $remainingQuota;
+
             $items_arr  = [];
-            $total      = 0;
+            $subtotal_gross = 0;
+            $total_item_cost = 0;
+            $total_potongan_kuota = 0;
+            $items_covered_by_quota = 0;
 
             foreach ($items_post as $idx => $item) {
                 $type = $item['type'] ?? '';
                 if (!isset($PRICES[$type])) continue;
                 $qty   = max(1, (int)($item['qty'] ?? 1));
                 $treat = $item['treatment'] ?? 'Deep Cleaning';
-                $price = ($PRICES[$type] + ($TREAT_EXTRA[$treat] ?? 0) + $FAST_EXTRA);
-                $sub   = $price * $qty;
-                $total += $sub;
-                $items_arr[] = ['type' => $type, 'qty' => $qty, 'treatment' => $treat, 'harga_satuan' => $price, 'subtotal' => $sub];
+                
+                $basePrice = $PRICES[$type];
+                $treatExtra = $TREAT_EXTRA[$treat] ?? 0;
+                $fullUnitPrice = $basePrice + $treatExtra + $FAST_EXTRA;
+
+                $itemPayTotal = 0;
+                $coveredQty = 0;
+
+                for ($q = 0; $q < $qty; $q++) {
+                    if ($isMember && $quotaPool > 0) {
+                        $quotaPool--;
+                        $items_covered_by_quota++;
+                        $coveredQty++;
+                        $total_potongan_kuota += $basePrice;
+
+                        $extra = $treatExtra + $FAST_EXTRA;
+                        if ($discountPercent > 0 && $extra > 0) {
+                            $disc = round(($extra * $discountPercent) / 100);
+                            $itemPayTotal += ($extra - $disc);
+                        } else {
+                            $itemPayTotal += $extra;
+                        }
+                    } else {
+                        $unitCost = $fullUnitPrice;
+                        if ($isMember && $discountPercent > 0) {
+                            $disc = round(($unitCost * $discountPercent) / 100);
+                            $unitCost -= $disc;
+                        }
+                        $itemPayTotal += $unitCost;
+                    }
+                }
+
+                $subtotal_gross += ($fullUnitPrice * $qty);
+                $total_item_cost += $itemPayTotal;
+
+                $items_arr[] = [
+                    'type' => $type,
+                    'qty' => $qty,
+                    'treatment' => $treat,
+                    'harga_satuan' => $fullUnitPrice,
+                    'subtotal' => $itemPayTotal,
+                    'covered_by_quota' => $coveredQty
+                ];
             }
 
             $kode       = generateOrderCode($conn);
             $items_json = json_encode($items_arr);
             $est        = getEstimasiSelesai($jenis_waktu);
+            $total_akhir = max(0, $total_item_cost);
+            $diskon_member = $total_potongan_kuota + ($subtotal_gross - ($total_item_cost + $total_potongan_kuota));
 
-            $ins = $conn->prepare("INSERT INTO orders (user_id, kode_order, items, jenis_waktu, total_harga, pickup_address, catatan, tanggal_estimasi, status) VALUES (?,?,?,?,?,?,?,?,'Menunggu')");
-            $ins->bind_param("isssdsss", $userId, $kode, $items_json, $jenis_waktu, $total, $pickup_addr, $catatan, $est);
+            if ($total_akhir <= 0) {
+                $order_status = 'Cuci';
+                $status_bayar = 'Lunas';
+                $metode_bayar = 'Kuota Member';
+            } else {
+                $order_status = 'Cuci';
+                $status_bayar = 'Belum Lunas';
+                $metode_bayar = 'COD';
+            }
+
+            $ins = $conn->prepare("INSERT INTO orders (user_id, kode_order, items, jenis_waktu, total_harga, diskon_member, tier_member, metode_pembayaran, status_pembayaran, pickup_address, catatan, tanggal_estimasi, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            $ins->bind_param("isssddsssssss", $userId, $kode, $items_json, $jenis_waktu, $total_akhir, $diskon_member, $memberTier, $metode_bayar, $status_bayar, $pickup_addr, $catatan, $est, $order_status);
 
             if ($ins->execute()) {
                 $order_id = $conn->insert_id;
@@ -102,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'no_hp' => $customer['no_hp'],
                     'jenis_waktu' => $jenis_waktu,
                     'tanggal_estimasi' => $est,
-                    'total_harga' => $total
+                    'total_harga' => $total_akhir
                 ];
                 $items = $items_arr;
                 
@@ -122,11 +183,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $insNota->execute();
 
                 // Notify admin
-                addNotification($conn, 0, "Order baru dari " . $_SESSION['nama'] . " — $kode (" . formatRupiah($total) . ")", "/admin/order_detail.php?id=$order_id");
+                addNotification($conn, 0, "Order baru dari " . $_SESSION['nama'] . " — $kode (" . formatRupiah($total_akhir) . ")", "/admin/order_detail.php?id=$order_id");
                 
                 // Send automatic WA notification to Customer via Fonnte
                 $notaUrl = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $nota_db_path;
-                $cust_pesan_wa = "Halo {$customer['nama_lengkap']},\n\nTerima kasih telah memesan di Footstepszs!\n\nPesanan Anda dengan kode *{$kode}* telah berhasil kami terima.\n\nBerikut link detail Nota Pesanan (IN) Anda:\n👉 {$notaUrl}\n\nLayanan: {$jenis_waktu}\nEstimasi Selesai: " . date('d F Y', strtotime($est)) . "\nTotal Pembayaran: " . formatRupiah($total) . "\n\nKami akan segera menjemput / memproses pesanan Anda. Terima kasih! 👟";
+                $cust_pesan_wa = "Halo {$customer['nama_lengkap']},\n\nTerima kasih telah memesan di Footstepszs!\n\nPesanan Anda dengan kode *{$kode}* telah berhasil kami terima.\n\nBerikut link detail Nota Pesanan (IN) Anda:\n👉 {$notaUrl}\n\nLayanan: {$jenis_waktu}\nEstimasi Selesai: " . date('d F Y', strtotime($est)) . "\nTotal Pembayaran: " . formatRupiah($total_akhir) . "\n\nKami akan segera menjemput / memproses pesanan Anda. Terima kasih!";
                 sendWhatsAppNotification($customer['no_hp'], $cust_pesan_wa);
 
                 // Redirect to success page
@@ -204,10 +265,10 @@ $userAddr = $conn->query("SELECT alamat FROM users WHERE id=" . (int)$_SESSION['
 
         <!-- Section 2: Items -->
         <div class="card" style="margin-bottom:1.5rem;">
-            <h3 style="font-size:15px;margin-bottom:1rem;color:var(--primary);font-weight:700;">2. Item Cucian 🛒</h3>
+            <h3 style="font-size:15px;margin-bottom:1rem;color:var(--primary);font-weight:700;">2. Item Cucian </h3>
             <div id="itemsContainer">
                 <div class="item-row" data-idx="0">
-                    <button type="button" class="remove-item-btn">✖</button>
+                    <button type="button" class="remove-item-btn">×</button>
                     <div class="item-grid">
                         <div class="form-group" style="margin:0">
                             <label class="form-label">Jenis Cucian</label>
@@ -241,12 +302,12 @@ $userAddr = $conn->query("SELECT alamat FROM users WHERE id=" . (int)$_SESSION['
 
         <!-- Section 3: Time Option -->
         <div class="card" style="margin-bottom:1.5rem;">
-            <h3 style="font-size:15px;margin-bottom:1rem;color:var(--primary);font-weight:700;">3. Pilihan Waktu ⏱</h3>
+            <h3 style="font-size:15px;margin-bottom:1rem;color:var(--primary);font-weight:700;">3. Pilihan Waktu </h3>
             <div class="waktu-grid" style="display:grid;gap:1rem;">
                 <label style="cursor:pointer">
                     <input type="radio" name="jenis_waktu" id="waktu_regular" value="Regular" checked style="display:none" class="waktu-radio">
                     <div class="waktu-card" style="border:2px solid var(--primary);background:var(--primary-light);border-radius:12px;padding:1.25rem;text-align:center;transition:all 0.2s">
-                        <div style="font-size:2rem;margin-bottom:0.5rem">📅</div>
+                        <div style="font-size:2rem;margin-bottom:0.5rem"></div>
                         <div style="font-weight:800;font-size:16px">Regular</div>
                         <div style="font-size:13px;color:var(--text-secondary);margin:0.25rem 0">Estimasi selesai <strong>2 hari</strong></div>
                         <div style="font-size:13px;font-weight:700;color:var(--primary)">Harga Normal</div>
@@ -255,7 +316,7 @@ $userAddr = $conn->query("SELECT alamat FROM users WHERE id=" . (int)$_SESSION['
                 <label style="cursor:pointer">
                     <input type="radio" name="jenis_waktu" id="waktu_fast" value="Fast Clean" style="display:none" class="waktu-radio">
                     <div class="waktu-card" style="border:2px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center;transition:all 0.2s">
-                        <div style="font-size:2rem;margin-bottom:0.5rem">⚡</div>
+                        <div style="font-size:2rem;margin-bottom:0.5rem"></div>
                         <div style="font-weight:800;font-size:16px">Fast Clean</div>
                         <div style="font-size:13px;color:var(--text-secondary);margin:0.25rem 0">Estimasi selesai <strong>1 hari</strong></div>
                         <div style="font-size:13px;font-weight:700;color:var(--warning)">+Rp 10.000/item</div>
@@ -264,7 +325,7 @@ $userAddr = $conn->query("SELECT alamat FROM users WHERE id=" . (int)$_SESSION['
             </div>
             
             <div class="estimation-box" style="margin-top:1.5rem;">
-                <div class="estimation-icon">📅</div>
+                <div class="estimation-icon"></div>
                 <div>
                     <div class="estimation-label">Estimasi Selesai</div>
                     <div class="estimation-value" id="estimasiTanggal">-</div>
@@ -274,7 +335,7 @@ $userAddr = $conn->query("SELECT alamat FROM users WHERE id=" . (int)$_SESSION['
 
         <!-- Section 4: Pickup Info -->
         <div class="card" style="margin-bottom:1.5rem;">
-            <h3 style="font-size:15px;margin-bottom:1rem;color:var(--primary);font-weight:700;">4. Informasi Pick Up 📍</h3>
+            <h3 style="font-size:15px;margin-bottom:1rem;color:var(--primary);font-weight:700;">4. Informasi Pick Up </h3>
             <div class="form-group">
                 <label class="form-label">Alamat Lengkap *</label>
                 <textarea name="pickup_address" class="form-control" rows="3" placeholder="Masukkan alamat lengkap untuk penjemputan / pengiriman..." required><?= htmlspecialchars($userAddr) ?></textarea>
